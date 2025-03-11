@@ -6,15 +6,26 @@ const router = express.Router();
 
 // Register User
 router.post('/register', async (req, res) => {
+    console.log("🔥 Incoming signup request:", req.body); // Debugging log
+
     const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+        console.error("⚠️ Missing fields:", req.body);
+        return res.status(400).json({ error: "Missing required fields" });
+    }
+
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         const result = await pool.query(
             'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *',
             [name, email, hashedPassword]
         );
+
+        console.log("✅ User inserted:", result.rows[0]);
         res.json({ message: 'User registered', user: result.rows[0] });
     } catch (err) {
+        console.error("❌ Database Error:", err.message);
         res.status(400).json({ error: err.message });
     }
 });
