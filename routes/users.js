@@ -22,13 +22,14 @@ router.post('/register', async (req, res) => {
             [name, email, hashedPassword]
         );
 
-        console.log("✅ User inserted:", result.rows[0]);
+        console.log("✅ User inserted:", result.rows[0]); // Debugging log
         res.json({ message: 'User registered', user: result.rows[0] });
     } catch (err) {
-        console.error("❌ Database Error:", err.message);
-        res.status(400).json({ error: err.message });
+        console.error("❌ Database Error:", err); // Log the full error object
+        res.status(400).json({ error: err.message }); // Send full error message to frontend
     }
 });
+
 
 // Login User
 router.post('/login', async (req, res) => {
