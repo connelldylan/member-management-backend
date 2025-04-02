@@ -47,3 +47,12 @@ app.get('/', (req, res) => {
     res.send('Backend is running!');
 });
 
+app.get('/test-db', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT NOW()');
+        res.json({ message: 'Database connected', time: result.rows[0].now });
+    } catch (err) {
+        console.error('Test DB Error:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
