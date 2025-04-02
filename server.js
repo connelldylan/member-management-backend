@@ -3,12 +3,13 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const pool = require('./db'); // Import pool from db.js
 
-const app = express(); // ✅ Define app first
+const app = express();
 
 // CORS Configuration
 const corsOptions = {
-    origin: "https://connelldylan.github.io", // Allow frontend origin
+    origin: "https://connelldylan.github.io",
     methods: "GET,POST,PUT,DELETE",
     allowedHeaders: "Content-Type,Authorization"
 };
@@ -39,20 +40,19 @@ app.get('/', (req, res) => {
     res.send('Backend is running!');
 });
 
+// Test database connection route
+app.get('/test-db', async (req, res) => {
+    try {
+        console.log('Attempting to connect to database...');
+        const result = await pool.query('SELECT NOW()');
+        console.log('Query successful:', result.rows[0]);
+        res.json({ message: 'Database connected', time: result.rows[0].now });
+    } catch (err) {
+        console.error('Test DB Error:', err.stack);
+        res.status(500).json({ error: err.message, stack: err.stack });
+    }
+});
+
 // Start the server
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
-
-app.get('/', (req, res) => {
-    res.send('Backend is running!');
-});
-
-app.get('/test-db', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT NOW()');
-        res.json({ message: 'Database connected', time: result.rows[0].now });
-    } catch (err) {
-        console.error('Test DB Error:', err);
-        res.status(500).json({ error: err.message });
-    }
-});
