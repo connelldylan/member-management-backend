@@ -48,4 +48,18 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.post('/admin/login', async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const admin = await pool.query('SELECT * FROM Admins WHERE Email = $1', [email]);
+        if (admin.rows.length === 0) return res.status(400).json({ message: 'Admin not found' });
+        const isMatch = await bcrypt.compare(password, admin.rows[0].password);
+        if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+        const token = jwt.sign({ id: admin.rows[0].aid, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.json({ token, admin: admin.rows[0] });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
 module.exports = router;
