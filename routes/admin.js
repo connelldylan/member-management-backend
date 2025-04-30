@@ -21,7 +21,7 @@ const verifyAdmin = (req, res, next) => {
 router.post('/delete-member', verifyAdmin, async (req, res) => {
     const { mid } = req.body;
     try {
-        const result = await pool.query('DELETE FROM Members WHERE MID = $1 RETURNING *', [mid]);
+        const result = await pool.query('DELETE FROM members WHERE MID = $1 RETURNING *', [mid]);
         if (result.rowCount === 0) return res.status(404).json({ error: 'Member not found' });
         res.json({ message: 'Member deleted', member: result.rows[0] });
     } catch (err) {
