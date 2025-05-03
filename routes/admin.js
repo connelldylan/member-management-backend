@@ -76,6 +76,17 @@ router.post('/increment-classes', verifyAdmin, async (req, res) => {
     }
 });
 
+router.get('/no-waiver', verifyAdmin, async (req, res) => {
+    try {
+        const result = await pool.query(
+            'SELECT MID, Name FROM members WHERE WaiverStatus = FALSE'
+        );
+        res.json({ members: result.rows });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 router.get('/avg-classes-by-belt', verifyAdmin, async (req, res) => {
     const { beltLevel } = req.query;
     try {
