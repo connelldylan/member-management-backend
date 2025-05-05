@@ -87,6 +87,7 @@ router.get('/no-waiver', verifyAdmin, async (req, res) => {
     }
 });
 
+//group 1 advanced
 router.get('/avg-classes-by-belt', verifyAdmin, async (req, res) => {
     const { beltLevel } = req.query;
     try {
@@ -100,6 +101,7 @@ router.get('/avg-classes-by-belt', verifyAdmin, async (req, res) => {
     }
 });
 
+//group 1 advanced
 router.get('/top-classes', verifyAdmin, async (req, res) => {
     try {
         const result = await pool.query(
@@ -124,6 +126,7 @@ router.get('/children', verifyAdmin, async (req, res) => {
     }
 });
 
+//group 3 advanced
 router.get('/package-revenue', verifyAdmin, async (req, res) => {
     const { month, year } = req.query;
     try {
@@ -143,6 +146,7 @@ router.get('/package-revenue', verifyAdmin, async (req, res) => {
     }
 });
 
+//group 1 advanced
 router.get('/search-name', verifyAdmin, async (req, res) => {
     const { substring } = req.query;
     try {
@@ -156,6 +160,7 @@ router.get('/search-name', verifyAdmin, async (req, res) => {
     }
 });
 
+//group 2 advanced
 router.get('/discounted-subscriptions', verifyAdmin, async (req, res) => {
     const { skip } = req.query;
     try {
@@ -174,6 +179,7 @@ router.get('/discounted-subscriptions', verifyAdmin, async (req, res) => {
     }
 });
 
+//group 1 advanced
 router.get('/count-referrals', verifyAdmin, async (req, res) => {
     const { mid } = req.query;
     try {
@@ -182,6 +188,34 @@ router.get('/count-referrals', verifyAdmin, async (req, res) => {
             [mid]
         );
         res.json({ referralCount: parseInt(result.rows[0].referralcount) });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+//group 2 advanced
+router.get('/members-with-referrals', verifyAdmin, async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT m.MID, m.Name, r.MID as ReferrerID
+             FROM members m
+             LEFT OUTER JOIN referred_by r ON m.MID = r.Referred`
+        );
+        res.json({ members: result.rows });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+//group 3 advanced
+router.get('/high-attendance-members', verifyAdmin, async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT MID, Name, ClassesAttended
+             FROM members
+             WHERE ClassesAttended > (SELECT AVG(ClassesAttended) FROM members)`
+        );
+        res.json({ highAttendanceMembers: result.rows });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
